@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = 'FFI wrapper around portable semaphore library with mutex and condition vars built on top.'
   s.author = 'Patrick Mahoney'
   s.email = 'pat@polycrystal.org'
-  s.homepage = ''
+  s.homepage = 'https://github.com/pmahoney/process_shared'
   s.files = Dir['lib/**/*.rb', 'lib/**/libpsem*', 'ext/**/*.{c,h,rb}', 'spec/**/*.rb']
   s.extensions = FileList["ext/**/extconf.rb"]
 
