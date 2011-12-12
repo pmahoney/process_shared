@@ -1,0 +1,20 @@
+Gem::Specification.new do |s|
+  s.name = 'process_shared'
+  s.version = '0.0.1'
+  s.platform = Gem::Platform::RUBY
+  s.has_rdoc = true
+  s.extra_rdoc_files = ["README.rdoc", "ChangeLog", "COPYING"]
+  s.summary = 'process-shared synchronization primitives'
+  s.description = 'FFI wrapper around portable semaphore library with mutex and condition vars built on top.'
+  s.author = 'Patrick Mahoney'
+  s.email = 'pat@polycrystal.org'
+  s.homepage = ''
+  s.files = Dir['lib/**/*.rb', 'lib/**/libpsem*', 'ext/**/*.{c,h,rb}', 'spec/**/*.rb']
+  s.extensions = FileList["ext/**/extconf.rb"]
+
+  s.add_dependency('ffi', '~> 1.0')
+
+  s.add_development_dependency('rake-compiler')
+  s.add_development_dependency('minitest')
+  s.add_development_dependency('minitest-matchers')
+end

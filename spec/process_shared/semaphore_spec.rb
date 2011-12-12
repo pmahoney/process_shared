@@ -1,0 +1,76 @@
+require 'spec_helper'
+
+require 'ffi'
+require 'process_shared/semaphore'
+require 'process_shared/shared_memory'
+
+module ProcessShared
+  describe Semaphore do
+    it 'coordinates access to shared object' do
+      nprocs = 4               # number of processes
+      nincrs = 1000            # each process increments nincrs times
+
+      do_increments = lambda do |mem, sem|
+        nincrs.times do
+          sem.wait
+          begin
+            val = mem.get_int(0)
+            # ensure other procs have a chance to interfere
+            sleep 0.001 if rand(100) == 0
+            mem.put_int(0, val + 1)
+          rescue => e
+            "#{Process.pid} die'ing because #{e}"
+          ensure
+            sem.post
+          end
+        end
+      end
+
+      # Make sure it fails with no synchronization
+      no_sem = Object.new
+      class << no_sem
+        def wait; end
+        def post; end
+      end
+      SharedMemory.open(FFI.type_size(:int)) do |mem|
+        pids = []
+        nprocs.times do
+          pids << fork { do_increments.call(mem, no_sem); exit }
+        end
+        
+        pids.each { |p| Process.wait(p) }
+        # puts "mem is #{mem.get_int(0)}"
+        mem.get_int(0).must be_lt(nprocs * nincrs)
+      end
+
+      # Now try with synchronization
+      SharedMemory.open(FFI.type_size(:int)) do |mem|
+        pids = []
+        Semaphore.open do |sem|
+          nprocs.times do
+            pids << fork { do_increments.call(mem, sem); exit }
+          end
+        end
+        
+        pids.each { |p| Process.wait(p) }
+        mem.get_int(0).must_equal(nprocs * nincrs)
+      end
+    end
+
+    describe '#post and #wait' do
+      it 'increments and decrements the value' do
+        Semaphore.open(0) do |sem|
+          10.times do |i|
+            sem.post
+            sem.value.must_equal(i + 1)
+          end
+
+          10.times do |i|
+            sem.wait
+            sem.value.must_equal(10 - i - 1)
+          end
+        end
+      end
+    end
+  end
+end

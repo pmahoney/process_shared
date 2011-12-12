@@ -1,0 +1,69 @@
+== Description
+
+Concurrency primitives that may be used in a cross-process way to
+coordinate share memory between processes.
+
+A small C library (libpsem) is compiled to support portable access to
+semaphores.  This library is then accessed using FFI to implement Ruby
+classes ProcessShared::Semaphore, ProcessShared::BoundedSemaphore,
+ProcessShared::Mutex, and ProcessShared::SharedMemory.
+
+This is an incomplete work in progress.
+
+== License
+
+MIT
+
+== Install
+Install the gem with:
+
+    gem install process_shared
+
+== Usage
+
+    require 'process_shared'
+
+    mutex = ProcessShared::Mutex.new
+    mem = ProcessShared::SharedMemory.new(:int)  # extends FFI::Pointer
+    mem.put_int(0, 0)
+
+    pid1 = fork do
+      puts "in process 1 (#{Process.pid})"
+      10.times do
+        sleep 0.01
+        mutex.synchronize do
+          value = mem.get_int(0)
+          sleep 0.01
+          puts "process 1 (#{Process.pid}) incrementing"
+          mem.put_int(0, value + 1)
+        end
+      end
+    end
+
+    pid2 = fork do
+      puts "in process 2 (#{Process.pid})"
+      10.times do
+        sleep 0.01
+        mutex.synchronize do
+          value = mem.get_int(0)
+          sleep 0.01
+          puts "process 2 (#{Process.pid}) decrementing"
+          mem.put_int(0, value - 1)
+        end
+      end
+    end
+
+    Process.wait(pid1)
+    Process.wait(pid2)
+
+    puts "value should be zero: #{mem.get_int(0)}"
+
+== Todo
+
+* Implement ConditionVariable
+* Implement optional override of core Thread/Mutex classes
+* Extend libpsem to win32?  (See Python's processing library)
+* Break out tests that use PSem.getvalue() (which isn't supported on Mac OS X)
+  so that the test suite will pass
+* Add finalizer to Mutex? (finalizer on Semaphore objects may be enough) or a method to
+  explicitly close and release resources?

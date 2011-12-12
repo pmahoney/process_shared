@@ -1,0 +1,60 @@
+require 'process_shared/psem'
+require 'process_shared/abstract_semaphore'
+
+module ProcessShared
+  class Semaphore < AbstractSemaphore
+    # With no associated block, open is a synonym for
+    # Semaphore.new. If the optional code block is given, it will be
+    # passed `sem` as an argument, and the Semaphore object will
+    # automatically be closed when the block terminates. In this
+    # instance, Semaphore.open returns the value of the block.
+    #
+    # @param [Integer] value the initial semaphore value
+    # @param [String] name not currently supported
+    def self.open(value = 1, name = nil, &block)
+      new(value, name).with_self(&block)
+    end
+
+    # Create a new semaphore with initial value `value`.  After
+    # Kernel#fork, the semaphore will be shared across two (or more)
+    # processes. The semaphore must be closed with #close in each
+    # process that no longer needs the semaphore.
+    #
+    # (An object finalizer is registered that will close the semaphore
+    # to avoid memory leaks, but this should be considered a last
+    # resort).
+    #
+    # @param [Integer] value the initial semaphore value
+    # @param [String] name not currently supported
+    def initialize(value = 1, name = nil)
+      init(PSem.sizeof_psem_t, 'psem', name) do |sem_name|
+        psem_open(sem, sem_name, value, err)
+      end
+    end
+
+    # Decrement the value of the semaphore.  If the value is zero,
+    # wait until another process increments via #post.
+    def wait
+      psem_wait(sem, err)
+    end
+
+    # Increment the value of the semaphore.  If other processes are
+    # waiting on this semaphore, one will be woken.
+    def post
+      psem_post(sem, err)
+    end
+
+    # Get the current value of the semaphore.
+    #
+    # @return [Integer] the current value of the semaphore.
+    def value
+      int = FFI::MemoryPointer.new(:int)
+      psem_getvalue(sem, int, err)
+      int.get_int(0)
+    end
+
+    def close
+      psem_close(sem, err)
+    end
+  end
+end
