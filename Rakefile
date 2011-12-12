@@ -13,7 +13,7 @@ end
 desc 'Run the tests'
 task :default => [:test]
 
-Rake::TestTask.new do |t|
+Rake::TestTask.new(:test => [:compile]) do |t|
   t.pattern = 'spec/**/*_spec.rb'
   t.libs.push 'spec'
 end
