@@ -3,9 +3,10 @@
 Concurrency primitives that may be used in a cross-process way to
 coordinate share memory between processes.
 
-A small C library (libpsem) is compiled to support portable access to
-semaphores.  This library is then accessed using FFI to implement Ruby
-classes ProcessShared::Semaphore, ProcessShared::BoundedSemaphore,
+A small C library (libpsem) is compiled to provide portable access to
+semaphores (based on http://pyprocessing.berlios.de/).  This library
+is then accessed using FFI to implement Ruby classes
+ProcessShared::Semaphore, ProcessShared::BoundedSemaphore,
 ProcessShared::Mutex, and ProcessShared::SharedMemory.
 
 This is an incomplete work in progress.
