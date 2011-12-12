@@ -20,6 +20,10 @@ module ProcessShared
 
     # @return [Mutex]
     def lock
+      if locked_by == ::Process.pid
+        raise ProcessError, "already locked by this process #{::Process.pid}"
+      end
+
       @sem.wait
       self.locked_by = ::Process.pid
       self
@@ -37,7 +41,7 @@ module ProcessShared
     def sleep(timeout = nil)
       unlock
       begin
-        timeout ? sleep(timeout) : sleep
+        timeout ? Kernel.sleep(timeout) : Kernel.sleep
       ensure
         lock
       end
@@ -62,6 +66,7 @@ module ProcessShared
         raise ProcessError, "lock is held by #{p} not #{::Process.pid}"
       end
 
+      self.locked_by = 0
       @sem.post
       self
     end

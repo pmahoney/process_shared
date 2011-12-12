@@ -70,5 +70,13 @@ module ProcessShared
 
       ::Process.wait(pid)
     end
+
+    it 'raises exception when locked twice by same process' do
+      mutex = Mutex.new
+
+      mutex.lock
+      proc { mutex.lock }.must_raise(ProcessError)
+      mutex.unlock
+    end
   end
 end
