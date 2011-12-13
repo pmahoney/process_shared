@@ -12,6 +12,8 @@ if have_func('sem_open', 'semaphore.h')
   end
 
   have_library('rt', 'sem_open')
+else
+  abort('Win32 or platform without sem_open not supported (yet?)')
 end
 
 c_sources = ['psem.c', 'psem_error.c', 'psem_posix.c', 'bsem.c', 'constants.c']
