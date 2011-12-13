@@ -5,6 +5,8 @@
  * Portable semaphore interface focusing on cross-process use.
  */
 
+#include <stdlib.h>		/* size_t */
+
 #ifdef HAVE_SEM_OPEN
 #include "psem_posix.h"
 #endif
