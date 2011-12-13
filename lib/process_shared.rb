@@ -1,6 +1,6 @@
 require 'ffi'
 
-if VERSION =~ /^1.8/
+if RUBY_VERSION =~ /^1.8/
   require 'process_shared/define_singleton_method'
   
   module ProcessShared

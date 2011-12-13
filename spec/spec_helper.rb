@@ -1,4 +1,4 @@
-require 'rubygems' if VERSION =~ /^1.8/
+require 'rubygems' if RUBY_VERSION =~ /^1.8/
 gem 'minitest'
 require 'minitest/spec'
 require 'minitest/autorun'
