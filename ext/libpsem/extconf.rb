@@ -17,7 +17,8 @@ end
 c_sources = ['psem.c', 'psem_error.c', 'psem_posix.c', 'bsem.c', 'constants.c']
 $objs += ['psem.o', 'psem_error.o', 'bsem.o', 'constants.o']
 
-depend_rules <<-END
+if respond_to? :depend_rules
+  depend_rules <<-END
 psem.c: psem.h psem_posix.c
 psem_error.c: psem_error.h
 
@@ -31,6 +32,6 @@ mempcpy.c: mempcpy.h
 
 libpsem.o: #{$objs.join(' ')}
 END
-
+end
 
 create_makefile('libpsem')
