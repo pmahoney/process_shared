@@ -2,9 +2,9 @@
 
 module ProcessShared
   module PosixCall
-    # Replace methods in `syms` with error checking wrappers that
-    # invoke the original method and raise a SystemCallError with the
-    # current errno if the return value is an error.
+    # Replace methods in +syms+ with error checking wrappers that
+    # invoke the original method and raise a {SystemCallError} with
+    # the current errno if the return value is an error.
     #
     # Errors are detected if the block returns true when called with
     # the original method's return value.

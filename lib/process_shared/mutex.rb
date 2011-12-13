@@ -4,12 +4,27 @@ require 'process_shared/shared_memory'
 require 'process_shared/process_error'
 
 module ProcessShared
+  # This Mutex class is implemented as a BoundedSemaphore with a
+  # maximum value of 1.  Additionally, the locking process is tracked,
+  # and {ProcessError} is raised if either {#unlock} is called by a
+  # process different from the locking process, or if {#lock} is
+  # called while the process already holds the lock (i.e. the mutex is
+  # not re-entrant).  This tracking is not without performance cost,
+  # of course (current implementation uses an additional
+  # {BoundedSemaphore} and {SharedMemory} segment).
+  #
+  # The API is intended to be identical to the {::Mutex} in the core
+  # Ruby library.
+  #
+  # TODO: the core Ruby api has no #close method, but this Mutex must
+  # release its {BoundedSemaphore} and {SharedMemory} resources.  For
+  # now, rely on the object finalizers of those objects...
   class Mutex
-    include WithSelf
+    # include WithSelf
 
-    def self.open(&block)
-      new.with_self(&block)
-    end
+    # def self.open(&block)
+    #   new.with_self(&block)
+    # end
 
     def initialize
       @internal_sem = BoundedSemaphore.new(1)
@@ -73,6 +88,8 @@ module ProcessShared
 
     # Acquire the lock, yield the block, then ensure the lock is
     # unlocked.
+    #
+    # @return [Object] the result of the block
     def synchronize
       lock
       begin

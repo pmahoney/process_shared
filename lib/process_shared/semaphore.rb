@@ -5,7 +5,7 @@ module ProcessShared
   class Semaphore < AbstractSemaphore
     # With no associated block, open is a synonym for
     # Semaphore.new. If the optional code block is given, it will be
-    # passed `sem` as an argument, and the Semaphore object will
+    # passed +sem+ as an argument, and the Semaphore object will
     # automatically be closed when the block terminates. In this
     # instance, Semaphore.open returns the value of the block.
     #
@@ -15,7 +15,7 @@ module ProcessShared
       new(value, name).with_self(&block)
     end
 
-    # Create a new semaphore with initial value `value`.  After
+    # Create a new semaphore with initial value +value+.  After
     # Kernel#fork, the semaphore will be shared across two (or more)
     # processes. The semaphore must be closed with #close in each
     # process that no longer needs the semaphore.
@@ -33,7 +33,7 @@ module ProcessShared
     end
 
     # Decrement the value of the semaphore.  If the value is zero,
-    # wait until another process increments via #post.
+    # wait until another process increments via {#post}.
     def wait
       psem_wait(sem, err)
     end
@@ -44,7 +44,8 @@ module ProcessShared
       psem_post(sem, err)
     end
 
-    # Get the current value of the semaphore.
+    # Get the current value of the semaphore. Raises {Errno::NOTSUP} on
+    # platforms that don't support this (e.g. Mac OS X).
     #
     # @return [Integer] the current value of the semaphore.
     def value
@@ -53,6 +54,11 @@ module ProcessShared
       int.get_int(0)
     end
 
+    # Release the resources associated with this semaphore.  Calls to
+    # other methods are undefined after {#close} has been called.
+    #
+    # Close must be called when the semaphore is no longer needed.  An
+    # object finalizer will close the semaphore as a last resort.
     def close
       psem_close(sem, err)
     end

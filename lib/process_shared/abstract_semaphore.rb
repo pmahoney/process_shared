@@ -8,17 +8,28 @@ module ProcessShared
     include ProcessShared::PSem
     public
 
-    # Generate a name for a semaphore.
+    # Generate a name for a semaphore.  If +name+ is given, it is used
+    # as the name (and so a semaphore could be shared by arbitrary
+    # processes not forked from one another).  Otherwise, a name is
+    # generated containing +middle+ and the process id.
+    #
+    # @param [String] middle arbitrary string used in the middle
+    # @param [String] name if given, used as the name
+    # @return [String] name, or the generated name
     def self.gen_name(middle, name = nil)
       if name
         name
       else
         @count ||= 0
         @count += 1
-        "ps-#{middle}-#{Process.pid}-#{@count}"
+        "ps-#{middle}-#{::Process.pid}-#{@count}"
       end
     end
 
+    # Make a Proc suitable for use as a finalizer that will call
+    # +psem_unlink+ on +name+ and ignore system errors.
+    #
+    # @return [Proc] a finalizer
     def self.make_finalizer(name)
       proc { ProcessShared::PSem.psem_unlink(name, nil) }
     end

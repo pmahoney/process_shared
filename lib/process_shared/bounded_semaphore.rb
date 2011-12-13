@@ -2,12 +2,15 @@ require 'process_shared/psem'
 require 'process_shared/semaphore'
 
 module ProcessShared
+  # BoundedSemaphore is identical to Semaphore except that its value
+  # is not permitted to rise above a maximum.  When the value is at
+  # the maximum, calls to #post will have no effect.
   class BoundedSemaphore < Semaphore
     # With no associated block, open is a synonym for
     # Semaphore.new. If the optional code block is given, it will be
-    # passed `sem` as an argument, and the Semaphore object will
+    # passed +sem+ as an argument, and the Semaphore object will
     # automatically be closed when the block terminates. In this
-    # instance, Semaphore.open returns the value of the block.
+    # instance, BoundedSemaphore.open returns the value of the block.
     #
     # @param [Integer] value the initial semaphore value
     # @param [String] name not currently supported
@@ -15,9 +18,9 @@ module ProcessShared
       new(maxvalue, value, name).with_self(&block)
     end
 
-    # Create a new semaphore with initial value `value`.  After
-    # Kernel#fork, the semaphore will be shared across two (or more)
-    # processes. The semaphore must be closed with #close in each
+    # Create a new semaphore with initial value +value+.  After
+    # {Kernel#fork}, the semaphore will be shared across two (or more)
+    # processes. The semaphore must be closed with {#close} in each
     # process that no longer needs the semaphore.
     #
     # (An object finalizer is registered that will close the semaphore
