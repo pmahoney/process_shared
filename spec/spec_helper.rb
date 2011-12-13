@@ -1,7 +1,10 @@
+require 'rubygems' if VERSION =~ /^1.8/
 gem 'minitest'
 require 'minitest/spec'
 require 'minitest/autorun'
 require 'minitest/matchers'
+
+require 'process_shared'
 
 class RangeMatcher
   def initialize(operator, limit)
