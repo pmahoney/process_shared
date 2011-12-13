@@ -3,7 +3,8 @@ require 'mkmf'
 $objs = []
 
 # posix semaphores
-if have_func('sem_open', 'semaphore.h')
+if have_func('sem_open', 'semaphore.h') ||
+    ($libs << '-lpthread' && have_func('sem_open', 'semaphore.h'))
   have_func('floorf', 'math.h') or abort("Missing required floorf() in math.h")
   have_library('m', 'floorf')
 
