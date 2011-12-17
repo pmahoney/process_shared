@@ -36,6 +36,15 @@ module ProcessShared
 
     # private_class_method :new
 
+    def synchronize
+      wait
+      begin
+        yield
+      ensure
+        post
+      end
+    end
+
     protected
 
     attr_reader :sem, :err

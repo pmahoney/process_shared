@@ -72,5 +72,29 @@ module ProcessShared
         end
       end
     end
+
+    describe '#try_wait' do
+      it 'returns immediately with non-zero semaphore' do
+        Semaphore.open(1) do |sem|
+          start = Time.now.to_f
+          sem.try_wait
+          (Time.now.to_f - start).must be_lt(0.01)
+        end
+      end
+
+      it 'raises EAGAIN with zero semaphore' do
+        Semaphore.open(0) do |sem|
+          proc { sem.try_wait }.must_raise(Errno::EAGAIN)
+        end
+      end
+
+      it 'raises ETIMEDOUT after timeout expires' do
+        Semaphore.open(0) do |sem|
+          start = Time.now.to_f
+          proc { sem.try_wait(0.1) }.must_raise(Errno::ETIMEDOUT)
+          (Time.now.to_f - start).must be_gte(0.1)
+        end
+      end
+    end
   end
 end

@@ -68,7 +68,6 @@ psem_free(psem_t *psem) {
       error_new((err), E_SOURCE_SYSTEM, errno);		\
       return ERROR;					\
     }							\
-    return OK;						\
   } while (0)
 
 #define errcheck(expr, err) errcheck_val((expr), -1, (err))
@@ -79,52 +78,77 @@ psem_open(psem_t *psem, const char *name, unsigned int value, error_t **err)
   errcheck_val(psem->sem = sem_open(name, O_CREAT | O_EXCL, 0600, value),
 	       SEM_FAILED,
 	       err);
+  return OK;
 }
 
 int
 psem_close(psem_t *psem, error_t **err)
 {
   errcheck(sem_close(psem->sem), err);
+  return OK;
 }
 
 int
 psem_unlink(const char *name, error_t **err)
 {
   errcheck(sem_unlink(name), err);
+  return OK;
 }
 
 int
 psem_post(psem_t *psem, error_t **err)
 {
   errcheck(sem_post(psem->sem), err);
+  return OK;
 }
 
 int
 psem_wait(psem_t *psem, error_t **err)
 {
   errcheck(sem_wait(psem->sem), err);
+  return OK;
 }
 
 int
 psem_trywait(psem_t *psem, error_t **err)
 {
   errcheck(sem_trywait(psem->sem), err);
+  return OK;
 }
+
+#define NS_PER_S (1000 * 1000 * 1000)
+#define US_PER_NS (1000)
 
 int
 psem_timedwait(psem_t *psem, float timeout_s, error_t **err)
 {
+  struct timeval now;
   struct timespec abs_timeout;
 
-  abs_timeout.tv_sec = floorf(timeout_s);
-  abs_timeout.tv_nsec =
-    floorf((timeout_s - abs_timeout.tv_sec) * (1000 * 1000 * 1000));
+  errcheck(gettimeofday(&now, NULL), err);
+  abs_timeout.tv_sec = now.tv_sec;
+  abs_timeout.tv_nsec = now.tv_usec * US_PER_NS;
+
+  /* Fun with rounding: careful adding reltive timeout to abs time */
+  {
+    time_t sec;		/* relative timeout */
+    long nsec;
+  
+    sec = floorf(timeout_s);
+    nsec = floorf((timeout_s - floorf(timeout_s)) * NS_PER_S);
+
+    abs_timeout.tv_sec += sec;
+    abs_timeout.tv_nsec += nsec;
+  }
 
   errcheck(sem_timedwait(psem->sem, &abs_timeout), err);
+  return OK;
 }
 
 int
 psem_getvalue(psem_t *psem, int *sval, error_t **err)
 {
   errcheck(sem_getvalue(psem->sem, sval), err);
+  return OK;
 }
+

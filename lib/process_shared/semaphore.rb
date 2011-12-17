@@ -38,6 +38,24 @@ module ProcessShared
       psem_wait(sem, err)
     end
 
+    # Decrement the value of the semaphore if it can be done
+    # immediately (i.e. if it was non-zero).  Otherwise, wait up to
+    # +timeout+ seconds until another process increments via {#post}.
+    #
+    # @param timeout [Numeric] the maximum seconds to wait, or nil to not wait
+    #
+    # @return If +timeout+ is nil and the semaphore cannot be
+    # decremented immediately, raise Errno::EAGAIN.  If +timeout+
+    # passed before the semaphore could be decremented, raise
+    # Errno::ETIMEDOUT.
+    def try_wait(timeout = nil)
+      if timeout
+        psem_timedwait(sem, timeout, err)
+      else
+        psem_trywait(sem, err)
+      end
+    end
+
     # Increment the value of the semaphore.  If other processes are
     # waiting on this semaphore, one will be woken.
     def post

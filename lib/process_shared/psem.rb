@@ -90,7 +90,7 @@ module ProcessShared
     attach_function :psem_post, [:pointer, :pointer], :int
     attach_function :psem_wait, [:pointer, :pointer], :int
     attach_function :psem_trywait, [:pointer, :pointer], :int
-    attach_function :psem_timedwait, [:pointer, :pointer, :pointer], :int
+    attach_function :psem_timedwait, [:pointer, :float, :pointer], :int
     attach_function :psem_getvalue, [:pointer, :pointer, :pointer], :int
 
     psem_error_check(:psem_open, :psem_close, :psem_unlink, :psem_post,
@@ -104,7 +104,7 @@ module ProcessShared
     attach_function :bsem_post, [:pointer, :pointer], :int
     attach_function :bsem_wait, [:pointer, :pointer], :int
     attach_function :bsem_trywait, [:pointer, :pointer], :int
-    attach_function :bsem_timedwait, [:pointer, :pointer, :pointer], :int
+    attach_function :bsem_timedwait, [:pointer, :float, :pointer], :int
     attach_function :bsem_getvalue, [:pointer, :pointer, :pointer], :int
 
     psem_error_check(:bsem_open, :bsem_close, :bsem_unlink, :bsem_post,

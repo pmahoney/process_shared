@@ -17,15 +17,16 @@ class RangeMatcher
   end
 
   def matches?(subject)
+    @subject = subject
     subject.send(@operator, @limit)
   end
 
   def failure_message_for_should
-    "expected #{operator} #{@limit}"
+    "expected #{@operator} #{@limit}, not #{@subject}"
   end
 
   def failure_message_for_should_not
-    "expected not #{operator} #{@limit}"
+    "expected not #{@operator} #{@limit}, not #{@subject}"
   end
 end
 
@@ -33,6 +34,14 @@ def be_lt(value)
   RangeMatcher.new('<', value)
 end
 
+def be_gt(value)
+  RangeMatcher.new('>', value)
+end
+
 def be_lte(value)
   RangeMatcher.new('<=', value)
+end
+
+def be_gte(value)
+  RangeMatcher.new('>=', value)
 end
