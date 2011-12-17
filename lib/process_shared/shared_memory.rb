@@ -13,6 +13,14 @@ module ProcessShared
       new(size).with_self(&block)
     end
 
+    def self.make_finalizer(addr, size, fd)
+      proc do
+        pointer = FFI::Pointer.new(addr)
+        LibC.munmap(pointer, size)
+        LibC.close(fd)
+      end
+    end
+
     def initialize(size)
       @size = case size
               when Symbol
@@ -34,12 +42,16 @@ module ProcessShared
                            LibC::MAP_SHARED,
                            @fd,
                            0)
+
+      @finalize = self.class.make_finalizer(@pointer.address, @size, @fd)
+      ObjectSpace.define_finalizer(self, @finalize)
+
       super(@pointer)
     end
 
     def close
-      LibC.munmap(@pointer, @size)
-      LibC.close(@fd)
+      ObjectSpace.undefine_finalizer(self)
+      @finalize.call
     end
   end
 end
