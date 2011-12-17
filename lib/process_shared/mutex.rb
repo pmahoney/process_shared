@@ -68,7 +68,7 @@ module ProcessShared
         if @locked_by.get_int(0) > 0
           false                 # was locked
         else
-          @sem.wait
+          @sem.wait             # should return immediately
           self.locked_by = ::Process.pid
           true
         end
