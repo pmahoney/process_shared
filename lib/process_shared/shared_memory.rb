@@ -3,7 +3,7 @@ require 'process_shared/libc'
 require 'process_shared/with_self'
 
 module ProcessShared
-  # Memory block shared across processes. TODO: finalizer that closes...
+  # Memory block shared across processes.
   class SharedMemory < FFI::Pointer
     include WithSelf
 
