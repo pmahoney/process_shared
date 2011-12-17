@@ -23,6 +23,9 @@ module ProcessShared
       # Replace methods in `syms` with error checking wrappers that
       # invoke the original psem method and raise an appropriate
       # error.
+      #
+      # The last argument is assumed to be a pointer to a pointer
+      # where either a psem error or NULL will be stored.
       def psem_error_check(*syms)
         syms.each do |sym|
           method = self.method(sym)
@@ -32,7 +35,8 @@ module ProcessShared
               errp = args[-1]
               unless errp.nil?
                 begin
-                  err = Error.new(errp.get_pointer(0))
+                  err = Error.new(errp.read_pointer)
+                  errp.write_pointer(nil)
                   if err[:source] == PSem.e_source_system
                     raise SystemCallError.new("error in #{sym}", err[:errno])
                   else
