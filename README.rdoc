@@ -70,3 +70,7 @@ Install the gem with:
   explicitly close and release resources?
 * Test semantics of crashing processes who still hold locks, etc.
 * Improve interface to SharedMemory to be more Array-like and generally usable
+* Remove bsem from libpsem as it is of little use and doesn't work on Mac OS X
+* Possibly implement BoundedSemaphore with arbitrary bound (in Ruby
+  rather than relying on sem_getvalue()), but this is of little
+  utility beyond extra error checking..
