@@ -95,6 +95,23 @@ module ProcessShared
           (Time.now.to_f - start).must be_gte(0.1)
         end
       end
+
+      it 'returns after waiting if another processes posts' do
+        Semaphore.open(0) do |sem|
+          start = Time.now.to_f
+
+          pid = fork do
+            sleep 0.01
+            sem.post
+            Kernel.exit!
+          end
+
+          sem.try_wait(0.1)
+          (Time.now.to_f - start).must be_lt(0.1)
+
+          ::Process.wait(pid)
+        end
+      end
     end
   end
 end
