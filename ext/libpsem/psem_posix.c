@@ -118,6 +118,7 @@ psem_trywait(psem_t *psem, error_t **err)
 
 #define NS_PER_S (1000 * 1000 * 1000)
 #define US_PER_NS (1000)
+#define TV_NSEC_MAX (NS_PER_S - 1)
 
 int
 psem_timedwait(psem_t *psem, float timeout_s, error_t **err)
@@ -139,6 +140,11 @@ psem_timedwait(psem_t *psem, float timeout_s, error_t **err)
 
     abs_timeout.tv_sec += sec;
     abs_timeout.tv_nsec += nsec;
+
+    while (abs_timeout.tv_nsec > TV_NSEC_MAX) {
+      abs_timeout.tv_sec += 1;
+      abs_timeout.tv_nsec -= NS_PER_S;
+    }
   }
 
   errcheck(sem_timedwait(psem->sem, &abs_timeout), err);
