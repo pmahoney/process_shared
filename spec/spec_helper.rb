@@ -3,8 +3,12 @@ gem 'minitest'
 require 'minitest/spec'
 require 'minitest/autorun'
 require 'minitest/matchers'
+require 'simplecov'
 
 require 'process_shared'
+SimpleCov.start do
+  add_filter "/spec/"
+end
 
 class RangeMatcher
   def initialize(operator, limit)
