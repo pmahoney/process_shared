@@ -7,7 +7,7 @@ module ProcessShared
   class SharedMemory < FFI::Pointer
     include WithSelf
 
-    attr_reader :size, :fd
+    attr_reader :size, :type, :type_size, :count, :fd
 
     def self.open(size, &block)
       new(size).with_self(&block)
@@ -21,13 +21,16 @@ module ProcessShared
       end
     end
 
-    def initialize(size)
-      @size = case size
-              when Symbol
-                FFI.type_size(size)
-              else
-                size
-              end
+    def initialize(type_or_count = 1, count = 1)
+      @type, @count = case type_or_count
+                      when Symbol
+                        [type_or_count, count]
+                      else
+                        [:uchar, type_or_count]
+                      end
+
+      @type_size = FFI.type_size(@type)
+      @size = @type_size * @count
 
       name = "/ps-shm#{rand(10000)}"
       @fd = RT.shm_open(name,
