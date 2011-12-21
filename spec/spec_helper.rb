@@ -4,6 +4,8 @@ require 'minitest/spec'
 require 'minitest/autorun'
 require 'minitest/matchers'
 
+require 'process_shared'
+
 class RangeMatcher
   def initialize(operator, limit)
     @operator = operator.to_sym
