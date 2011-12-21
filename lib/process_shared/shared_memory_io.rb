@@ -126,8 +126,20 @@ module ProcessShared
       _getbyte
     end
 
-    def getc
-      raise NotImplementedError
+    # {#getc} in Ruby 1.9 returns String or nil.  In 1.8, it returned
+    # Fixnum of nil (identical to getbyte).
+    #
+    # FIXME: should this be encoding/character aware?
+    def getc19
+      if b = getbyte
+        '' << b
+      end
+    end
+    # FIXME: ignores versions prior to 1.8.
+    if RUBY_VERSION =~ /^1.8/
+      alias_method :getc, :getbyte
+    else
+      alias_method :getc, :getc19
     end
 
     def gets
