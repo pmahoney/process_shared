@@ -59,6 +59,23 @@ Install the gem with:
 
     puts "value should be zero: #{mem.get_int(0)}"
 
+== Transfer Objects Across Processes
+
+    # allocate a sufficient memory block
+    mem = ProcessShared::SharedMemory.new(1024)
+
+    # sub process can write (serialize) object to memory (with bounds checking)
+    pid = fork do
+      mem.write_object(['a', 'b'])
+    end
+
+    Process.wait(pid)
+
+    # parent process can read the object back (synchronizing access
+    # with a Mutex left as an excercie to reader)
+
+    mem.read_object.must_equal ['a', 'b']
+
 == Todo
 
 * Test ConditionVariable
@@ -69,7 +86,7 @@ Install the gem with:
 * Add finalizer to Mutex? (finalizer on Semaphore objects may be enough) or a method to
   explicitly close and release resources?
 * Test semantics of crashing processes who still hold locks, etc.
-* Improve interface to SharedMemory to be more Array-like and generally usable
+* Is SharedArray with Enumerable mixing sufficient Array-like interface?
 * Remove bsem from libpsem as it is of little use and doesn't work on Mac OS X
 * Possibly implement BoundedSemaphore with arbitrary bound (in Ruby
   rather than relying on sem_getvalue()), but this is of little
