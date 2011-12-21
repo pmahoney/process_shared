@@ -10,7 +10,9 @@ module ProcessShared
     end
 
     def broadcast
-      waiting.times { @sem.post }
+      @internal.synchronize do
+        @waiting.read_int.times { @sem.post }
+      end
     end
 
     def signal
@@ -37,12 +39,6 @@ module ProcessShared
     end
 
     private
-
-    def waiting
-      @internal.synchronize do
-        @waiting.read_int
-      end
-    end
 
     def inc_waiting(val = 1)
       @internal.synchronize do
