@@ -21,9 +21,10 @@ module ProcessShared
       # See https://github.com/ffi/ffi/issues/118
       ffi_type = FFI.find_type(self.type)
 
-      name, _ = FFI::TypeDefs.find do |(name, t)|
-        t == ffi_type
-      end
+      name = if ffi_type.inspect =~ /FFI::Type::Builtin:(\w+)*/
+               # name will be something like int32
+               $1.downcase
+             end
 
       unless name
         raise ArgumentError, "could not find FFI::Type for #{self.type}"
