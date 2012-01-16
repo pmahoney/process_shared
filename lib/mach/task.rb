@@ -11,17 +11,20 @@ module Mach
     end
 
     def initialize(task)
-      super(task)
+      super(:port => task)
     end
 
     alias_method :task, :port
 
+    # @param [MachSpecialPort] which_port
     def get_special_port(which_port)
       mem = FFI::MemoryPointer.new(:int)
       task_get_special_port(task, which_port, mem)
-      Port.new(mem.get_int(0))
+      Port.new(:port => mem.get_int(0))
     end
 
+    # @param [MachSpecialPort] which_port
+    #
     # @param [Port,Integer] newport
     def set_special_port(which_port, newport)
       p = newport.respond_to?(:port) ? newport.port : newport

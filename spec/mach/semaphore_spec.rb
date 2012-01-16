@@ -20,12 +20,12 @@ module Mach
     end
 
     it 'raises exception with invalid args' do
-      p = proc { Semaphore.new(1, :sync_policy => :no_such) }
+      p = proc { Semaphore.new(:sync_policy => :no_such) }
       p.must_raise ArgumentError # Error::INVALID_ARGUMENT
     end
 
     it 'signals/waits in same task' do
-      sem = Semaphore.new(0)
+      sem = Semaphore.new(:value => 0)
       sem.signal
       sem.wait
       sem.destroy

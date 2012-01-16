@@ -7,9 +7,10 @@ module Mach
 
     # Create a new Semaphore.
     #
-    # @param [Integer] value the initial value of the semaphore
-    #
     # @param [Hash] opts
+    #
+    # @option opts [Integer] :value the initial value of the
+    # semaphore; defaults to 1
     #
     # @option opts [Integer] :task the Mach task that owns the
     # semaphore (defaults to Mach.task_self)
@@ -17,14 +18,24 @@ module Mach
     # @options opts [Integer] :sync_policy the sync policy for this
     # semaphore (defaults to SyncPolicy::FIFO)
     #
+    # @options opts [Integer] :port existing port to wrap with a
+    # Semaphore object; otherwise a new semaphore is created
+    #
     # @return [Integer] a semaphore port name
-    def initialize(value = 1, opts = {})
+    def initialize(opts = {})
+      value = opts[:value] || 1
       task = opts[:task] || ipc_space || mach_task_self
       sync_policy = opts[:sync_policy] || :fifo
 
-      mem = new_memory_pointer(:semaphore_t)
-      semaphore_create(task, mem, sync_policy, value)
-      super(mem.get_uint(0), :ipc_space => task)
+      port = if opts[:port]
+               opts[:port]
+             else
+               mem = new_memory_pointer(:semaphore_t)
+               semaphore_create(task, mem, sync_policy, value)
+               mem.get_uint(0)
+             end
+
+      super(:port => port, :ipc_space => task)
     end
 
     # Destroy a Semaphore.

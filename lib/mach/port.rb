@@ -6,20 +6,27 @@ module Mach
 
     attr_reader :ipc_space, :port
 
-    # either initialize(port, opts) -or- initialize(opts)
-    def initialize(opts = {}, opts2 = {})
+    # @param [Hash] opts
+    #
+    # @option opts [Integer] :ipc_space defaults to +mach_task_self+
+    #
+    # @option opts [MachPortRight] :right defaults to +:receive+
+    #
+    # @option opts [Port, Integer] :port if given, the existing port
+    # is wrapped in a new Port object; otherwise a new port is
+    # allocated according to the other options
+    def initialize(opts = {})
       if opts.kind_of? Hash
-        ipc_space = opts[:ipc_space] || mach_task_self
+        @ipc_space = opts[:ipc_space] || mach_task_self
         right = opts[:right] || :receive
 
-        mem = new_memory_pointer(:mach_port_right_t)
-        mach_port_allocate(ipc_space, right, mem)
-
-        @port = mem.get_uint(0)
-        @ipc_space = ipc_space
-      else
-        @port = opts
-        @ipc_space = opts2[:ipc_space] || mach_task_self
+        @port = if opts[:port]
+                  opts[:port].kind_of?(Port) ? opts[:port].port : opts[:port]
+                else
+                  mem = new_memory_pointer(:mach_port_right_t)
+                  mach_port_allocate(@ipc_space, right, mem)
+                  mem.get_uint(0)
+                end
       end
     end
 

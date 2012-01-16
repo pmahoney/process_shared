@@ -1,3 +1,5 @@
+require 'ffi'
+
 module Mach
   # FFI wrapper around a subset of the Mach API (likely Mac OS X
   # specific).
@@ -212,13 +214,13 @@ module Mach
 
     attach_mach_function(:task_get_special_port,
                          [:task_t,
-                          :int,
+                          MachSpecialPort,
                           :mach_port_pointer_t],
                          :kern_return_t)
 
     attach_mach_function(:task_set_special_port,
                          [:task_t,
-                          :int,
+                          MachSpecialPort,
                           :mach_port_t],
                          :kern_return_t)
 
