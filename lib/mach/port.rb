@@ -100,7 +100,7 @@ module Mach
       send_right(:copy_send, remote_port)
     end
 
-    # Create a new Port be receiving a port right message on this
+    # Create a new Port by receiving a port right message on this
     # port.
     def receive_right
       msg = FFI::Struct.new(nil,
