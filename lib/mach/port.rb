@@ -69,8 +69,6 @@ module Mach
     # must already have the requisite rights allowing it to send
     # +right+.
     def send_right(right, remote_port)
-      puts "send_right: (in #{mach_task_self}) sending #{right} on #{port} -> #{remote_port.to_i}"
-
       msg = FFI::Struct.new(nil,
                             :header, MsgHeader,
                             :body, MsgBody,
