@@ -24,11 +24,11 @@ module Mach
     # @return [Integer] a semaphore port name
     def initialize(opts = {})
       value = opts[:value] || 1
-      task = opts[:task] || ipc_space || mach_task_self
+      task = (opts[:task] && opts[:task].to_i) || ipc_space || mach_task_self
       sync_policy = opts[:sync_policy] || :fifo
 
       port = if opts[:port]
-               opts[:port]
+               opts[:port].to_i
              else
                mem = new_memory_pointer(:semaphore_t)
                semaphore_create(task, mem, sync_policy, value)
@@ -46,7 +46,7 @@ module Mach
     # semaphore (defaults to the owning task)
     def destroy(opts = {})
       task = opts[:task] || ipc_space || mach_task_self
-      semaphore_destroy(task, port)
+      semaphore_destroy(task.to_i, port)
     end
 
     def signal

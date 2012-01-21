@@ -18,17 +18,16 @@ module Mach
 
     # @param [MachSpecialPort] which_port
     def get_special_port(which_port)
-      mem = FFI::MemoryPointer.new(:int)
+      mem = new_memory_pointer(:mach_port_t)
       task_get_special_port(task, which_port, mem)
-      Port.new(:port => mem.get_int(0))
+      Port.new(:port => mem.get_uint(0))
     end
 
     # @param [MachSpecialPort] which_port
     #
     # @param [Port,Integer] newport
     def set_special_port(which_port, newport)
-      p = newport.respond_to?(:port) ? newport.port : newport
-      task_set_special_port(task, which_port, p)
+      task_set_special_port(task, which_port, newport.to_i)
     end
 
     def get_bootstrap_port

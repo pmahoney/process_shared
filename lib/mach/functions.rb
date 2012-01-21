@@ -11,6 +11,13 @@ module Mach
     typedef :__darwin_mach_port_t, :mach_port_t
     typedef :__darwin_natural_t, :natural_t
 
+    typedef :int, :integer_t
+    typedef :int, :kern_return_t # true for 64 bit??
+    typedef :int, :mach_error_t
+    typedef :int, :sync_policy_t # SyncPolicy
+
+    typedef :string, :name_t
+
     typedef :mach_port_t, :task_t
     typedef :mach_port_t, :ipc_space_t
     typedef :mach_port_t, :semaphore_t
@@ -22,12 +29,47 @@ module Mach
     typedef :pointer, :mach_port_name_pointer_t
 
     typedef :uint, :mach_msg_type_name_t
+    typedef :uint, :mach_msg_bits_t
+    typedef :uint, :mach_msg_trailer_type_t
+    typedef :uint, :mach_msg_trailer_size_t
+    typedef :uint, :mach_msg_descriptor_type_t
+    typedef :natural_t, :mach_msg_timeout_t
 
-    typedef :int, :kern_return_t # true for 64 bit??
-    typedef :int, :mach_error_t
-    typedef :int, :sync_policy_t # SyncPolicy
+    typedef :natural_t, :mach_msg_size_t
+    typedef :integer_t, :mach_msg_id_t
+    typedef :integer_t, :mach_msg_options_t
+    typedef :integer_t, :mach_msg_option_t
 
-    typedef :string, :name_t
+    class MsgHeader < FFI::Struct
+      layout(:bits, :mach_msg_bits_t,
+             :size, :mach_msg_size_t,
+             :remote_port, :mach_port_t,
+             :local_port, :mach_port_t,
+             :reserved, :mach_msg_size_t,
+             :id, :mach_msg_id_t)
+    end
+
+    class MsgBody < FFI::Struct
+      layout(:descriptor_count, :mach_msg_size_t)
+    end
+
+    class MsgBase < FFI::Struct
+      layout(:header, MsgHeader,
+             :body, MsgBody)
+    end
+
+    class MsgTrailer < FFI::Struct
+      layout(:type, :mach_msg_trailer_type_t,
+             :size, :mach_msg_trailer_size_t)
+    end
+
+    class MsgPortDescriptor < FFI::Struct
+      layout(:name, :mach_port_t,
+             :pad1, :mach_msg_size_t, # FIXME: leave oout on __LP64__
+             :pad2, :uint16, # :uint
+             :disposition, :uint8, # :mach_msg_type_name_t
+             :type, :uint8) # :mach_msg_descriptor_type_t
+    end
 
     SyncPolicy = enum( :fifo, 0x0,
                        :fixed_priority, 0x1,
@@ -52,6 +94,9 @@ module Mach
       end
       acc
     end
+
+    MACH_PORT_NULL = 0
+    MACH_MSG_TIMEOUT_NONE = 0
     
     MachPortType =
       enum(:none, 0,
@@ -222,6 +267,28 @@ module Mach
                          [:task_t,
                           MachSpecialPort,
                           :mach_port_t],
+                         :kern_return_t)
+
+    #####################
+    # Message functions #
+    #####################
+
+    attach_mach_function(:mach_msg_send,
+                         [:pointer], # msg_header_t
+                         :kern_return_t)
+
+    attach_mach_function(:mach_msg,
+                         [:pointer, # msg_header_t
+                          :mach_msg_option_t,
+                          :mach_msg_size_t,
+                          :mach_msg_size_t,
+                          :mach_port_name_t,
+                          :mach_msg_timeout_t,
+                          :mach_port_name_t],
+                         :kern_return_t)
+
+    attach_mach_function(:mach_msg_receive,
+                         [:pointer], # msg_header_t
                          :kern_return_t)
 
     #######################
