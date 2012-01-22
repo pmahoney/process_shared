@@ -58,11 +58,23 @@ module Mach
       mach_port_deallocate(ipc_space.to_i, @port)
     end
 
-    def insert_right(msg_type, opts = {})
+    # Insert +right+ into another ipc space.  The current task must
+    # have sufficient rights to insert the requested right.
+    #
+    # @param [MachMsgType] right
+    #
+    # @param [Hash] opts
+    #
+    # @option opts [Port,Integer] :ipc_space the space (task port) into which
+    # +right+ will be inserted; defaults to this port's ipc_space
+    #
+    # @option opts [Port,Integer] :port the name the port right should
+    # have in :ipc_space; defaults to the same name as this port
+    def insert_right(right, opts = {})
       ipc_space = opts[:ipc_space] || @ipc_space
       port_name = opts[:port_name] || @port
       
-      mach_port_insert_right(ipc_space.to_i, port_name.to_i, @port, msg_type)
+      mach_port_insert_right(ipc_space.to_i, port_name.to_i, @port, right)
     end
 
     # Send +right+ on this Port to +remote_port+.  The current task
