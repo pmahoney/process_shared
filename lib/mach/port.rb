@@ -9,6 +9,23 @@ module Mach
   class Port
     include Functions
 
+    class SendRightMsg < FFI::Struct
+      include Functions
+
+      layout(:header, MsgHeader,
+             :body, MsgBody,
+             :port, MsgPortDescriptor)
+    end
+
+    class ReceiveRightMsg < FFI::Struct
+      include Functions
+
+      layout(:header, MsgHeader,
+             :body, MsgBody,
+             :port, MsgPortDescriptor,
+             :trailer, MsgTrailer)
+    end
+
     attr_reader :ipc_space, :port
 
     # @param [Hash] opts
@@ -21,18 +38,16 @@ module Mach
     # is wrapped in a new Port object; otherwise a new port is
     # allocated according to the other options
     def initialize(opts = {})
-      if opts.kind_of? Hash
-        @ipc_space = opts[:ipc_space] || mach_task_self
-        right = opts[:right] || :receive
+      @ipc_space = opts[:ipc_space] || mach_task_self
+      right = opts[:right] || :receive
 
-        @port = if opts[:port]
-                  opts[:port].to_i
-                else
-                  mem = new_memory_pointer(:mach_port_right_t)
-                  mach_port_allocate(@ipc_space.to_i, right, mem)
-                  mem.get_uint(0)
-                end
-      end
+      @port = if opts[:port]
+                opts[:port].to_i
+              else
+                mem = new_memory_pointer(:mach_port_right_t)
+                mach_port_allocate(@ipc_space.to_i, right, mem)
+                mem.get_uint(0)
+              end
     end
 
     # With this alias, we can call #to_i on either bare Integer ports
@@ -81,17 +96,14 @@ module Mach
     # must already have the requisite rights allowing it to send
     # +right+.
     def send_right(right, remote_port)
-      msg = FFI::Struct.new(nil,
-                            :header, MsgHeader,
-                            :body, MsgBody,
-                            :port, MsgPortDescriptor)
-      
+      msg = SendRightMsg.new
+
       msg[:header].tap do |h|
         h[:remote_port] = remote_port.to_i
         h[:local_port] = MACH_PORT_NULL
         h[:bits] =
           (MachMsgType[right] | (0 << 8)) | 0x80000000 # MACH_MSGH_BITS_COMPLEX
-        h[:size] = msg.size
+        h[:size] = 40 # msg.size
       end
 
       msg[:body][:descriptor_count] = 1
@@ -115,11 +127,7 @@ module Mach
     # Create a new Port by receiving a port right message on this
     # port.
     def receive_right
-      msg = FFI::Struct.new(nil,
-                            :header, MsgHeader,
-                            :body, MsgBody,
-                            :port, MsgPortDescriptor,
-                            :trailer, MsgTrailer)
+      msg = ReceiveRightMsg.new
   
       mach_msg(msg,
                2, # MACH_RCV_MSG,
