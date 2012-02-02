@@ -58,16 +58,18 @@ module ProcessShared
     end
 
     describe '#post and #wait' do
-      it 'increments and decrements the value' do
-        Semaphore.open(0) do |sem|
-          10.times do |i|
-            sem.post
-            sem.value.must_equal(i + 1)
-          end
+      unless FFI::Platform.mac?
+        it 'increments and decrements the value' do
+          Semaphore.open(0) do |sem|
+            10.times do |i|
+              sem.post
+              sem.value.must_equal(i + 1)
+            end
 
-          10.times do |i|
-            sem.wait
-            sem.value.must_equal(10 - i - 1)
+            10.times do |i|
+              sem.wait
+              sem.value.must_equal(10 - i - 1)
+            end
           end
         end
       end
