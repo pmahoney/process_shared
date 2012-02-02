@@ -83,10 +83,6 @@ module ProcessShared
         sem_wait(@sem)
       end
 
-      NS_PER_S = 1e9
-      US_PER_NS = 1000
-      TV_NSEC_MAX = (NS_PER_S - 1)
-
       # Decrement the value of the semaphore if it can be done
       # immediately (i.e. if it was non-zero).  Otherwise, wait up to
       # +timeout+ seconds until another process increments via {#post}.
@@ -100,24 +96,9 @@ module ProcessShared
       def try_wait(timeout = nil)
         if timeout
           now = TimeVal.new
-          abs_timeout = TimeSpec.new
-
           LibC.gettimeofday(now, nil)
-
-          abs_timeout[:tv_sec] = now[:tv_sec];
-          abs_timeout[:tv_nsec] = now[:tv_usec] * US_PER_NS
-
-          # add timeout in seconds to abs_timeout; careful with rounding
-          sec = timeout.floor
-          nsec = ((timeout - sec) * NS_PER_S).floor
-
-          abs_timeout[:tv_sec] += sec
-          abs_timeout[:tv_nsec] += nsec
-          while abs_timeout[:tv_nsec] > TV_NSEC_MAX
-            abs_timeout[:tv_sec] += 1
-            abs_timeout[:tv_nsec] -= NS_PER_S
-          end
-
+          abs_timeout = now.to_time_spec
+          abs_timeout.add_seconds!(timeout)
           sem_timedwait(@sem, abs_timeout)
         else
           sem_trywait(@sem)
