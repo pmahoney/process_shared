@@ -1,5 +1,3 @@
-require 'process_shared/rt'
-require 'process_shared/libc'
 require 'process_shared/with_self'
 require 'process_shared/shared_memory_io'
 

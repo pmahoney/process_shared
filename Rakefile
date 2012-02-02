@@ -6,10 +6,6 @@ def gemspec
   @gemspec ||= eval(File.read('process_shared.gemspec'), binding, 'process_shared.gemspec')
 end
 
-Rake::ExtensionTask.new('libpsem') do |ext|
-  ext.lib_dir = 'lib/process_shared'
-end
-
 Rake::ExtensionTask.new('helper') do |ext|
   ext.lib_dir = 'lib/process_shared/posix'
 end
