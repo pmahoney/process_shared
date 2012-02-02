@@ -8,8 +8,10 @@ module Mach
     class PROTECTION_FAILURE < Error; end
     class NO_SPACE < Error; end
     class INVALID_ARGUMENT < Error; end
-    class INVALID_NAME < Error; end
     class FAILURE < Error; end
+    class ABORTED < Error; end
+    class INVALID_NAME < Error; end
+    class OPERATION_TIMED_OUT < Error; end
 
     include Functions
 
@@ -20,7 +22,9 @@ module Mach
               when 3; then NO_SPACE
               when 4; then INVALID_ARGUMENT
               when 5; then FAILURE
+              when 14; then ABORTED
               when 15; then INVALID_NAME
+              when 49; then OPERATION_TIMED_OUT
               else FAILURE
               end
 
