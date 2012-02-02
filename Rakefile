@@ -18,7 +18,7 @@ desc 'Run the tests'
 task :default => [:test]
 
 Rake::TestTask.new(:test => [:compile]) do |t|
-  t.pattern = 'spec/**/*_spec.rb'
+  t.pattern = 'spec/process_shared/**/*_spec.rb'
   t.libs.push 'spec'
 end
 
