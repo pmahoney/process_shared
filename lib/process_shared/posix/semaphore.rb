@@ -55,7 +55,7 @@ module ProcessShared
       # resort).
       #
       # @param [Integer] value the initial semaphore value
-      def initialize(value)
+      def initialize(value = 1)
         @sem = SharedMemory.new(LibC.type_size(:sem_t))
         sem_init(@sem, 1, value)
         ObjectSpace.define_finalizer(self, self.class.make_finalizer(@sem))
