@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'process_shared/shared_memory'
+require 'process_shared'
 
 module ProcessShared
   describe SharedMemory do
