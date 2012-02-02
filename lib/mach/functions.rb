@@ -1,5 +1,7 @@
 require 'ffi'
 
+require 'mach/time_spec'
+
 module Mach
   # FFI wrapper around a subset of the Mach API (likely Mac OS X
   # specific).
@@ -15,9 +17,12 @@ module Mach
     typedef :int, :kern_return_t # true for 64 bit??
     typedef :int, :mach_error_t
     typedef :int, :sync_policy_t # SyncPolicy
+    typedef :int, :clock_id_t
+    typedef :int, :clock_res_t
 
     typedef :string, :name_t
 
+    typedef :mach_port_t, :host_t
     typedef :mach_port_t, :task_t
     typedef :mach_port_t, :ipc_space_t
     typedef :mach_port_t, :semaphore_t
@@ -127,11 +132,6 @@ module Mach
             :host,
             :name,
             :bootstrap )
-
-    class Timespec < FFI::ManagedStruct
-      layout(:tv_sec, :uint,
-             :tv_nsec, :int)
-    end
 
     KERN_SUCCESS = 0
 
@@ -254,6 +254,18 @@ module Mach
                          :kern_return_t)
 
     ##################
+    # Host functions #
+    ##################
+
+    attach_function :mach_host_self, [], :mach_port_t
+
+    attach_mach_function(:host_get_clock_service,
+                         [:host_t,
+                          :clock_id_t,
+                          :pointer],
+                         :kern_return_t)
+
+    ##################
     # Task functions #
     ##################
 
@@ -267,6 +279,15 @@ module Mach
                          [:task_t,
                           MachSpecialPort,
                           :mach_port_t],
+                         :kern_return_t)
+
+    ###################
+    # Clock functions #
+    ###################
+
+    attach_mach_function(:clock_get_time,
+                         [:clock_id_t,
+                          TimeSpec],
                          :kern_return_t)
 
     #####################
@@ -312,7 +333,7 @@ module Mach
                          [:semaphore_t],
                          :kern_return_t)
     attach_mach_function(:semaphore_timedwait,
-                         [:semaphore_t, Timespec.val],
+                         [:semaphore_t, TimeSpec.val],
                          :kern_return_t)
 
   end

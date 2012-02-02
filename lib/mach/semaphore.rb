@@ -1,5 +1,7 @@
 require 'mach/functions'
 require 'mach/port'
+require 'mach/host'
+require 'mach/clock'
 
 module Mach
   class Semaphore < Port
@@ -61,8 +63,11 @@ module Mach
       semaphore_wait(port)
     end
 
-    # TODO: implement
+    # @see http://pkaudio.blogspot.com/2010/05/mac-os-x-no-timed-semaphore-waits.html
     def timedwait(secs)
+      timespec = TimeSpec.new
+      timespec.add_seconds!(secs)
+
       semaphore_timedwait(port, timespec)
     end
   end
