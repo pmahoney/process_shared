@@ -5,3 +5,6 @@ tmp
 Gemfile.lock
 *.so
 *.bundle
+.yardoc
+doc
+
