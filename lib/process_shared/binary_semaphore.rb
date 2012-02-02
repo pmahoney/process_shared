@@ -1,4 +1,7 @@
-require 'process_shared/psem'
+require 'forwardable'
+
+require 'process_shared'
+require 'process_shared/with_self'
 require 'process_shared/semaphore'
 require 'process_shared/process_error'
 
@@ -9,7 +12,16 @@ module ProcessShared
   # exception.
   #
   # This is identical to a Semaphore but with extra error checking.
-  class BinarySemaphore < Semaphore
+  class BinarySemaphore
+    extend Forwardable
+    include ProcessShared::WithSelf
+
+    def_delegators :@sem, :wait, :try_wait, :synchronize, :value, :close
+
+    def self.open(value = 1, &block)
+      new(value).with_self(&block)
+    end
+
     # Create a new semaphore with initial value +value+.  After
     # {Kernel#fork}, the semaphore will be shared across two (or more)
     # processes. The semaphore must be closed with {#close} in each
@@ -20,10 +32,9 @@ module ProcessShared
     # resort).
     #
     # @param [Integer] value the initial semaphore value
-    # @param [String] name not currently supported
-    def initialize(value = 1, name = nil)
+    def initialize(value = 1)
       raise ArgumentErrror 'value must be 0 or 1' if (value < 0 or value > 1)
-      super(value, name)
+      @sem = Semaphore.new(value)
     end
 
     # Increment from zero to one.
@@ -37,11 +48,11 @@ module ProcessShared
       begin
         try_wait
         # oops, value was not zero...
-        psem_post(sem, err)
+        @sem.post
         raise ProcessError, 'post would raise value over bound'
       rescue Errno::EAGAIN
         # ok, value was zero
-        psem_post(sem, err)
+        @sem.post
       end
     end
   end
