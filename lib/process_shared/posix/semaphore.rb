@@ -1,8 +1,9 @@
+require 'process_shared/semaphore'
+
 require 'process_shared/posix/errno'
 require 'process_shared/posix/libc'
 require 'process_shared/posix/time_val'
 require 'process_shared/posix/time_spec'
-require 'process_shared/with_self'
 
 module ProcessShared
   module Posix
@@ -34,7 +35,7 @@ module ProcessShared
       end
 
       include Foreign
-      include ProcessShared::WithSelf
+      include ProcessShared::Semaphore
 
       # Make a Proc suitable for use as a finalizer that will call
       # +shm_unlink+ on +sem+.
@@ -42,17 +43,6 @@ module ProcessShared
       # @return [Proc] a finalizer
       def self.make_finalizer(sem)
         proc { LibC.shm_unlink(sem) }
-      end
-
-      # With no associated block, open is a synonym for
-      # Semaphore.new. If the optional code block is given, it will be
-      # passed +sem+ as an argument, and the Semaphore object will
-      # automatically be closed when the block terminates. In this
-      # instance, Semaphore.open returns the value of the block.
-      #
-      # @param [Integer] value the initial semaphore value
-      def self.open(value = 1, &block)
-        new(value).with_self(&block)
       end
 
       # Create a new semaphore with initial value +value+.  After
