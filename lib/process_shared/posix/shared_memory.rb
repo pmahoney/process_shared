@@ -2,7 +2,8 @@ require 'ffi'
 
 require 'process_shared/posix/errno'
 require 'process_shared/posix/libc'
-require 'process_shared/shared_memory'
+require 'process_shared/object_buffer'
+require 'process_shared/open_with_self'
 
 module ProcessShared
   module Posix
@@ -25,10 +26,10 @@ module ProcessShared
         error_check :shm_open, :shm_unlink
       end
 
+      extend ProcessShared::OpenWithSelf
       include SharedMemory::Foreign
       include LibC
-      
-      include ProcessShared::SharedMemory
+      include ProcessShared::ObjectBuffer
 
       attr_reader :size, :type, :type_size, :count, :fd
 

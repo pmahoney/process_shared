@@ -1,7 +1,7 @@
 require 'process_shared'
 
 module ProcessShared
-  class SharedArray < SharedMemory.impl
+  class SharedArray < SharedMemory
     include Enumerable
 
     # A fixed-size array in shared memory.  Processes forked from this

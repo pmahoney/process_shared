@@ -1,8 +1,7 @@
 require 'forwardable'
 
 require 'process_shared'
-require 'process_shared/with_self'
-require 'process_shared/semaphore'
+require 'process_shared/open_with_self'
 require 'process_shared/process_error'
 
 module ProcessShared
@@ -14,13 +13,9 @@ module ProcessShared
   # This is identical to a Semaphore but with extra error checking.
   class BinarySemaphore
     extend Forwardable
-    include ProcessShared::WithSelf
+    extend ProcessShared::OpenWithSelf
 
     def_delegators :@sem, :wait, :try_wait, :synchronize, :value, :close
-
-    def self.open(value = 1, &block)
-      new(value).with_self(&block)
-    end
 
     # Create a new semaphore with initial value +value+.  After
     # {Kernel#fork}, the semaphore will be shared across two (or more)

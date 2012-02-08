@@ -1,6 +1,5 @@
 require 'spec_helper'
-require 'process_shared/mutex'
-require 'process_shared/shared_memory'
+require 'process_shared'
 
 module ProcessShared
   describe Mutex do
@@ -60,9 +59,9 @@ module ProcessShared
 
       pid = Kernel.fork do
         mutex.lock
-        sleep 0.2
-        mutex.unlock
-        Kernel.exit!
+        # sleep 0.2
+        # mutex.unlock
+        # Kernel.exit!
       end
 
       sleep 0.1

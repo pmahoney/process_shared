@@ -1,6 +1,5 @@
-require 'process_shared/semaphore'
-require 'process_shared/with_self'
-require 'process_shared/shared_memory'
+require 'process_shared'
+require 'process_shared/open_with_self'
 require 'process_shared/process_error'
 
 module ProcessShared
@@ -20,11 +19,7 @@ module ProcessShared
   # release its {Semaphore} and {SharedMemory} resources.  For now,
   # rely on the object finalizers of those objects...
   class Mutex
-    # include WithSelf
-
-    # def self.open(&block)
-    #   new.with_self(&block)
-    # end
+    extend OpenWithSelf
 
     def initialize
       @internal_sem = Semaphore.new

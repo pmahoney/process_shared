@@ -1,23 +1,9 @@
-require 'process_shared/with_self'
 require 'process_shared/shared_memory_io'
 
 module ProcessShared
-  # Memory block shared across processes.
-  module SharedMemory
-    include ProcessShared::WithSelf
-
-    class << self
-      attr_accessor :impl
-
-      def new(*args)
-        impl.new(*args)
-      end
-
-      def open(size, &block)
-        new(size).with_self(&block)
-      end
-    end
-
+  # Provides reading and writing of serialized objects from a memory
+  # buffer.
+  module ObjectBuffer
     # Write the serialization of +obj+ (using Marshal.dump) to this
     # shared memory object at +offset+ (in bytes).
     #

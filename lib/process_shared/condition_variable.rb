@@ -1,4 +1,4 @@
-require 'process_shared/semaphore'
+require 'process_shared'
 
 module ProcessShared
   class ConditionVariable

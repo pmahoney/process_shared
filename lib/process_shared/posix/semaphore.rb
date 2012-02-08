@@ -1,4 +1,5 @@
-require 'process_shared/semaphore'
+require 'process_shared/synchronizable_semaphore'
+require 'process_shared/open_with_self'
 
 require 'process_shared/posix/errno'
 require 'process_shared/posix/libc'
@@ -34,8 +35,9 @@ module ProcessShared
                     :sem_timedwait)
       end
 
+      extend ProcessShared::OpenWithSelf
       include Foreign
-      include ProcessShared::Semaphore
+      include ProcessShared::SynchronizableSemaphore
 
       # Make a Proc suitable for use as a finalizer that will call
       # +shm_unlink+ on +sem+.

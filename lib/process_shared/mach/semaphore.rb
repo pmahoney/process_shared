@@ -2,12 +2,15 @@ require 'mach'
 require 'mach/error'
 
 require 'process_shared/mach'
+require 'process_shared/open_with_self'
+require 'process_shared/synchronizable_semaphore'
 
 module ProcessShared
   module Mach
     # Extends ::Mach::Semaphore to be compatible with ProcessShared::Semaphore
     class Semaphore < ::Mach::Semaphore
-      include ProcessShared::Semaphore
+      extend ProcessShared::OpenWithSelf
+      include ProcessShared::SynchronizableSemaphore
 
       def initialize(value = 1)
         super(:value => value)
