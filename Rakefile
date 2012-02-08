@@ -1,6 +1,7 @@
 require 'rake/extensiontask'
 require 'rake/testtask'
 require 'rubygems/package_task'
+require 'ffi'
 
 def gemspec
   @gemspec ||= eval(File.read('process_shared.gemspec'), binding, 'process_shared.gemspec')
@@ -14,7 +15,11 @@ desc 'Run the tests'
 task :default => [:test]
 
 Rake::TestTask.new(:test => [:compile]) do |t|
-  t.pattern = 'spec/process_shared/**/*_spec.rb'
+  if FFI::Platform.mac?
+    t.pattern = 'spec/**/*_spec.rb' # only include mach tests on mac
+  else
+    t.pattern = 'spec/process_shared/**/*_spec.rb'
+  end
   t.libs.push 'spec'
 end
 
