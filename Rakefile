@@ -4,7 +4,7 @@ require 'rubygems/package_task'
 require 'ffi'
 
 def gemspec
-  @gemspec ||= eval(File.read('process_shared.gemspec'), binding, 'process_shared.gemspec')
+  @gemspec ||= Gem::Specification.load('process_shared.gemspec')
 end
 
 Rake::ExtensionTask.new('helper') do |ext|
