@@ -59,9 +59,9 @@ module ProcessShared
 
       pid = Kernel.fork do
         mutex.lock
-        # sleep 0.2
-        # mutex.unlock
-        # Kernel.exit!
+        sleep 0.2
+        mutex.unlock
+        Kernel.exit!
       end
 
       sleep 0.1
