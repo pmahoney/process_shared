@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'process_shared'
-  s.version = '0.1.1'
+  s.version = File.read(File.expand_path('../VERSION', __FILE__))
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README.rdoc", "ChangeLog", "COPYING"]
@@ -18,4 +18,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rake-compiler')
   s.add_development_dependency('minitest')
   s.add_development_dependency('minitest-matchers')
+  s.add_development_dependency('version')
 end
