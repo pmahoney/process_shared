@@ -37,7 +37,13 @@ module Mach
         port.insert_right(:make_send)
         Task.self.set_bootstrap_port(port)
 
-        child = fork do
+        method = if Process.respond_to?(:__mach_original_fork__)
+                   :__mach_original_fork__
+                 else
+                   :fork
+                 end
+
+        child = Process.send(method) do
           parent_port = Task.self.get_bootstrap_port
           Task.self.copy_send(parent_port)
           # parent will copy send rights to sem into child task
@@ -50,7 +56,7 @@ module Mach
 
         start = Time.now.to_f
         sem.insert_right(:copy_send, :ipc_space => child_task_port)
-        sem.wait
+        sem.timedwait(1)
         elapsed = Time.now.to_f - start
 
         Process.wait child
