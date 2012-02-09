@@ -76,7 +76,7 @@ module Mach
     # Insert +right+ into another ipc space.  The current task must
     # have sufficient rights to insert the requested right.
     #
-    # @param [MachMsgType] right
+    # @param [MsgType] right
     #
     # @param [Hash] opts
     #
@@ -100,9 +100,9 @@ module Mach
 
       msg[:header].tap do |h|
         h[:remote_port] = remote_port.to_i
-        h[:local_port] = MACH_PORT_NULL
+        h[:local_port] = PORT_NULL
         h[:bits] =
-          (MachMsgType[right] | (0 << 8)) | 0x80000000 # MACH_MSGH_BITS_COMPLEX
+          (MsgType[right] | (0 << 8)) | 0x80000000 # MACH_MSGH_BITS_COMPLEX
         h[:size] = 40 # msg.size
       end
 
@@ -110,8 +110,8 @@ module Mach
 
       msg[:port].tap do |p|
         p[:name] = port
-        p[:disposition] = MachMsgType[right]
-        p[:type] = 0 # MACH_MSG_PORT_DESCRIPTOR;
+        p[:disposition] = MsgType[right]
+        p[:type] = 0 # MSG_PORT_DESCRIPTOR;
       end
       
       mach_msg_send msg
@@ -130,12 +130,12 @@ module Mach
       msg = ReceiveRightMsg.new
   
       mach_msg(msg,
-               2, # MACH_RCV_MSG,
+               2, # RCV_MSG,
                0,
                msg.size,
                port,
-               MACH_MSG_TIMEOUT_NONE,
-               MACH_PORT_NULL)
+               MSG_TIMEOUT_NONE,
+               PORT_NULL)
 
       self.class.new :port => msg[:port][:name]
     end

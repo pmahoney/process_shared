@@ -46,6 +46,10 @@ end
 
 module Kernel
   # Override to call Process::fork.
+  def self.fork(*args, &block)
+    Process.fork(*args, &block)
+  end
+
   def fork(*args, &block)
     Process.fork(*args, &block)
   end
