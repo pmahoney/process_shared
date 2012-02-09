@@ -15,7 +15,7 @@ module ProcessShared
           begin
             val = mem.get_int(0)
             # ensure other procs have a chance to interfere
-            sleep 0.001 if rand(100) == 0
+            sleep 0.002 if rand(50) == 0
             mem.put_int(0, val + 1)
           rescue => e
             "#{Process.pid} die'ing because #{e}"
