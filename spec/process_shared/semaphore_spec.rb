@@ -5,6 +5,25 @@ require 'process_shared'
 
 module ProcessShared
   describe Semaphore do
+
+    describe 'As Lock' do
+
+      include LockBehavior
+
+      before :each do
+        @lock = Semaphore.new
+        class << @lock
+          alias_method :lock, :wait
+          alias_method :unlock, :post
+        end
+      end
+
+      after :each do
+        @lock.close
+      end
+
+    end
+
     it 'coordinates access to shared object' do
       nprocs = 4               # number of processes
       nincrs = 1000            # each process increments nincrs times

@@ -5,6 +5,7 @@ require 'minitest/autorun'
 require 'minitest/matchers'
 
 require 'process_shared'
+require 'process_shared/lock_behavior'
 
 class RangeMatcher
   def initialize(operator, limit)

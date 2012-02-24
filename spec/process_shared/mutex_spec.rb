@@ -1,8 +1,6 @@
 require 'spec_helper'
 require 'process_shared'
 
-require 'process_shared/lock_behavior'
-
 module ProcessShared
   describe Mutex do
 
