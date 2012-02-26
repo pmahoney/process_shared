@@ -4,6 +4,7 @@ require 'rake/testtask'
 require 'rake/version_task'
 require 'rubygems/package_task'
 require 'rubygems/gem_runner'
+require 'ci/reporter/rake/minitest'
 
 def gemspec
   @gemspec ||= Gem::Specification.load('process_shared.gemspec')
