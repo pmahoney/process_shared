@@ -3,11 +3,23 @@
 Concurrency primitives that may be used in a cross-process way to
 coordinate share memory between processes.
 
-A small C library (libpsem) is compiled to provide portable access to
-semaphores (based on http://pyprocessing.berlios.de/).  This library
-is then accessed using FFI to implement Ruby classes
-ProcessShared::Semaphore, ProcessShared::BoundedSemaphore,
-ProcessShared::Mutex, and ProcessShared::SharedMemory.
+FFI is used to access POSIX semaphore on Linux or Mach semaphores on
+Mac.  Atop these semaphores are implemented ProcessShared::Semaphore,
+ProcessShared::Mutex.  POSIX shared memory is used to implement
+ProcessShared::SharedMemory.
+
+On Linux, POSIX semaphores support `sem_timedwait()` which can wait on
+a semaphore but stop waiting after a timeout.
+
+Mac OS X's implementation of POSIX semaphores does not support
+timeouts.  But, the Mach layer in Mac OS X has its own semaphores that
+do support timeouts.  Thus, process_shared implements a moderate
+subset of the Mach API, which is quite a bit different from POSIX.
+Namely, semaphores created in one process are not available in child
+processes created via `fork()`.  Mach does provide the means to copy
+capabilities between tasks (Mach equivalent to processes).
+process_shared overrides Ruby's `fork` methods so that semaphores are
+copied from parent to child to emulate the POSIX behavior.
 
 This is an incomplete work in progress.
 
@@ -80,14 +92,8 @@ Install the gem with:
 
 * Test ConditionVariable
 * Implement optional override of core Thread/Mutex classes
-* Extend libpsem to win32?  (See Python's processing library)
-* Break out tests that use PSem.getvalue() (which isn't supported on Mac OS X)
-  so that the test suite will pass
+* Extend to win32?  (See Python's processing library)
 * Add finalizer to Mutex? (finalizer on Semaphore objects may be enough) or a method to
   explicitly close and release resources?
 * Test semantics of crashing processes who still hold locks, etc.
 * Is SharedArray with Enumerable mixing sufficient Array-like interface?
-* Remove bsem from libpsem as it is of little use and doesn't work on Mac OS X
-* Possibly implement BoundedSemaphore with arbitrary bound (in Ruby
-  rather than relying on sem_getvalue()), but this is of little
-  utility beyond extra error checking..
