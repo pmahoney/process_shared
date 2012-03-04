@@ -8,7 +8,7 @@ Mac.  Atop these semaphores are implemented ProcessShared::Semaphore,
 ProcessShared::Mutex.  POSIX shared memory is used to implement
 ProcessShared::SharedMemory.
 
-On Linux, POSIX semaphores support +sem_timedwait()+ which can wait on
+On Linux, POSIX semaphores support <tt>sem_timedwait()</tt> which can wait on
 a semaphore but stop waiting after a timeout.
 
 Mac OS X's implementation of POSIX semaphores does not support
@@ -16,9 +16,9 @@ timeouts.  But, the Mach layer in Mac OS X has its own semaphores that
 do support timeouts.  Thus, process_shared implements a moderate
 subset of the Mach API, which is quite a bit different from POSIX.
 Namely, semaphores created in one process are not available in child
-processes created via +fork()+.  Mach does provide the means to copy
+processes created via <tt>fork()</tt>.  Mach does provide the means to copy
 capabilities between tasks (Mach equivalent to processes).
-process_shared overrides Ruby's +fork+ methods so that semaphores are
+process_shared overrides Ruby's <tt>fork</tt> methods so that semaphores are
 copied from parent to child to emulate the POSIX behavior.
 
 This is an incomplete work in progress.
