@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.add_dependency('ffi', '~> 1.0')
 
   s.add_development_dependency('ci_reporter')
+  s.add_development_dependency('flog')
   s.add_development_dependency('minitest')
   s.add_development_dependency('minitest-matchers')
   s.add_development_dependency('rake')

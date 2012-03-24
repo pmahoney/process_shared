@@ -1,10 +1,12 @@
+require 'ci/reporter/rake/minitest'
 require 'ffi'
+require 'fileutils'
+require 'flog'
 require 'rake/extensiontask'
 require 'rake/testtask'
 require 'rake/version_task'
-require 'rubygems/package_task'
 require 'rubygems/gem_runner'
-require 'ci/reporter/rake/minitest'
+require 'rubygems/package_task'
 
 def gemspec
   @gemspec ||= Gem::Specification.load('process_shared.gemspec')
@@ -51,3 +53,21 @@ if Version.current.prerelease?
     sh %{rake push version:bump:pre}
   end
 end
+
+desc 'Generate flog reports for all ruby code'
+task :flog do
+  opts = {
+    :all => true,
+    :blame => true,
+    :details => true,
+    :group => true
+  }
+  flog = Flog.new(opts)
+  flog.flog('lib')
+  out = 'target/reports/flog.txt'
+  FileUtils.mkdir_p(File.dirname(out))
+  File.open('target/reports/flog.txt', 'wb') {|io| flog.report io }
+end
+
+desc 'Run test for CI environment with xunit reports and flog'
+task :ci_test => ['ci:setup:minitest', :test, :flog]
