@@ -14,10 +14,10 @@ Gem::Specification.new do |s|
 
   s.add_dependency('ffi', '~> 1.0')
 
-  s.add_development_dependency('rake')
-  s.add_development_dependency('rake-compiler')
+  s.add_development_dependency('ci_reporter')
   s.add_development_dependency('minitest')
   s.add_development_dependency('minitest-matchers')
+  s.add_development_dependency('rake')
+  s.add_development_dependency('rake-compiler')
   s.add_development_dependency('version')
-  s.add_development_dependency('ci_reporter')
 end
