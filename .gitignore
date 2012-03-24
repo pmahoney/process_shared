@@ -7,4 +7,5 @@ Gemfile.lock
 *.bundle
 .yardoc
 doc
+target
 
