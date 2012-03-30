@@ -29,4 +29,5 @@ require 'process_shared/binary_semaphore'
 require 'process_shared/mutex'
 require 'process_shared/condition_variable'
 require 'process_shared/monitor'
+require 'process_shared/monitor_mixin'
 
