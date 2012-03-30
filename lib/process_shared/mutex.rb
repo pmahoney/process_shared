@@ -108,13 +108,8 @@ module ProcessShared
       end
     end
 
-    def with_internal_lock
-      @internal_sem.wait
-      begin
-        yield
-      ensure
-        @internal_sem.post
-      end
+    def with_internal_lock(&block)
+      @internal_sem.synchronize &block
     end
   end
 end
