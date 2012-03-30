@@ -94,7 +94,7 @@ module ProcessShared
       end
     end
 
-    private
+    protected
 
     def locked_by
       with_internal_lock do
