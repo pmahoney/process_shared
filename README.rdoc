@@ -92,6 +92,12 @@ Install the gem with:
 
 See spec/process_shared/condition_variable_spec.rb for examples/usage.
 
+== Notes
+
+Note that REE with its COW friendly GC might save you some memory when you fork processes
+(or you could turn off the GC for short lived child processes).  2.0 is supposed to also
+have a COW friendly GC.
+
 == Todo
 
 * Test ConditionVariable
