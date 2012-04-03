@@ -88,6 +88,10 @@ Install the gem with:
 
     mem.read_object.must_equal ['a', 'b']
 
+== ConditionVariables
+
+See spec/process_shared/condition_variable_spec.rb for examples/usage.
+
 == Todo
 
 * Test ConditionVariable
