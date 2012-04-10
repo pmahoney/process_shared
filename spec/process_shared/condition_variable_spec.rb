@@ -26,6 +26,30 @@ module ProcessShared
       ::Process.wait(b)
     end
 
+    it 'can signal outside the mutex' do
+      mutex = Mutex.new
+      resource = ConditionVariable.new
+      mem = SharedMemory.new(:int)
+      mem.write_int(0)
+
+      a = fork {
+        mutex.synchronize {
+          resource.wait(mutex)
+        }
+        mem.write_int 1
+        Kernel.exit!
+      }
+      sleep 0.2
+      b = fork {
+        resource.signal
+        Kernel.exit!
+      }
+
+      ::Process.wait(a)
+      ::Process.wait(b)
+      mem.read_int.must_equal(1)
+    end
+
     it 'broadcasts to multiple processes' do
       mutex = Mutex.new
       cond = ConditionVariable.new

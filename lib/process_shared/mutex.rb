@@ -26,6 +26,7 @@ module ProcessShared
       @locked_by = SharedMemory.new(:int)
 
       @sem = Semaphore.new
+      @_cv ||= ConditionVariable.new
     end
 
     # @return [Mutex]
@@ -45,16 +46,20 @@ module ProcessShared
     end
 
     # Releases the lock and sleeps timeout seconds if it is given and
-    # non-nil or forever.
+    # non-nil or unless #wakeup_first is called, i.e.
+    # fork { mutex.synchronize { mutex.sleep } }
+    # sleep 0.2; mutex.wakeup_first # wakes up the first process, like Thread#wakeup would in threaded land
     #
     # @return [Numeric]
     def sleep(timeout = nil)
-      unlock
-      begin
-        timeout ? Kernel.sleep(timeout) : Kernel.sleep
-      ensure
-        lock
-      end
+      assert_held_by_this_process
+      @_cv.wait(self, timeout)
+    end
+
+    # wakes up first process 'sleeping' on this mutex, like Thread#wakeup
+    # not sure what it returns.
+    def wakeup_first
+      @_cv.signal
     end
 
     # @return [Boolean]
@@ -70,12 +75,17 @@ module ProcessShared
       end
     end
 
-    # @return [Mutex]
-    def unlock
+    private
+    def assert_held_by_this_process
       if (p = locked_by) != ::Process.pid
         raise ProcessError, "lock is held by #{p} not #{::Process.pid}"
       end
+    end
+    public
 
+    # @return [Mutex]
+    def unlock
+      assert_held_by_this_process
       self.locked_by = 0
       @sem.post
       self
