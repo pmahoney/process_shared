@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.author = 'Patrick Mahoney'
   s.email = 'pat@polycrystal.org'
   s.homepage = 'https://github.com/pmahoney/process_shared'
-  s.files = Dir['lib/**/*.rb', 'lib/**/libpsem*', 'ext/**/*.{c,h,rb}', 'spec/**/*.rb']
+  s.files = Dir['lib/**/*.rb', 'ext/**/*.{c,h,rb}', 'spec/**/*.rb']
   s.extensions = Dir['ext/**/extconf.rb']
 
   s.add_dependency('ffi', '~> 1.0')

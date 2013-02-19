@@ -33,8 +33,6 @@ pkg = Gem::PackageTask.new(gemspec) do |p|
   p.gem_spec = gemspec
 end
 
-task :gem => :compile
-
 Rake::VersionTask.new do |t|
   t.with_git_tag = true
 end
