@@ -131,6 +131,31 @@ module ProcessShared
           ::Process.wait(pid)
         end
       end
+
+      it 'allows other threads in a process to continue while waiting' do
+        # NOTE: A similar test in LockBehavior tests Semaphore#wait,
+        # Mutex#lock, etc. Necessary only to test #try_wait here.
+
+        start = Time.now.to_f
+        was_set = false
+
+        Semaphore.open(0) do |sem|
+          t1 = Thread.new do
+            # give t2 a chance to wait on the lock, then set the flag
+            sleep 0.01
+            was_set = true
+          end
+
+          t2 = Thread.new do
+            sem.try_wait(10.0)
+          end
+
+          t1.join
+        end
+
+        was_set.must_equal true
+        (Time.now.to_f - start).must be_lt(0.1)
+      end
     end
   end
 end

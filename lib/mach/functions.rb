@@ -212,7 +212,8 @@ module Mach
                          :blocking => true)
     attach_mach_function(:semaphore_timedwait,
                          [:semaphore_t, TimeSpec.val],
-                         :kern_return_t)
+                         :kern_return_t,
+                         :blocking => true)
 
   end
 end
