@@ -55,6 +55,26 @@ module ProcessShared
       mem.get_char(0).must_equal(0)
     end
 
+    def test_allows_other_threads_within_a_process_to_continue_while_locked
+      was_set = false
+
+      @lock.synchronize do
+        t1 = Thread.new do
+          # give t2 a chance to wait on the lock, then set the flag
+          sleep 0.01
+          was_set = true
+        end
+
+        t2 = Thread.new do
+          @lock.synchronize { }
+        end
+
+        # t1 should set the flag and die while t2 is still waiting on the lock
+        t1.join
+      end
+
+      was_set.must_equal(true)
+    end
 
   end
 end
