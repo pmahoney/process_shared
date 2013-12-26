@@ -91,6 +91,32 @@ module ProcessShared
           end
         end
       end
+
+      it 'allows other threads in a process to continue while waiting' do
+        sem = Semaphore.new
+        was_set = false
+        t2 = nil
+
+        sem.synchronize do
+          t1 = Thread.new do
+            # give t2 a chance to wait on the lock, then set the flag
+            sleep 0.01
+            was_set = true
+          end
+
+          t2 = Thread.new do
+            sem.synchronize { }
+          end
+
+          # t1 should set the flag and die while t2 is still waiting on the lock
+          t1.join
+        end
+
+        was_set.must_equal true
+
+        t2.join
+      end
+
     end
 
     describe '#try_wait' do
@@ -133,13 +159,12 @@ module ProcessShared
       end
 
       it 'allows other threads in a process to continue while waiting' do
-        # NOTE: A similar test in LockBehavior tests Semaphore#wait,
-        # Mutex#lock, etc. Necessary only to test #try_wait here.
-
         start = Time.now.to_f
+        sem = Semaphore.new
         was_set = false
+        t2 = nil
 
-        Semaphore.open(0) do |sem|
+        sem.synchronize do
           t1 = Thread.new do
             # give t2 a chance to wait on the lock, then set the flag
             sleep 0.01
@@ -147,14 +172,21 @@ module ProcessShared
           end
 
           t2 = Thread.new do
-            sem.try_wait(10.0)
+            begin
+              sem.try_wait(10.0)
+            rescue Errno::ETIMEDOUT
+              # success
+            end
           end
 
+          # t1 should set the flag and die while t2 is still waiting on the lock
           t1.join
         end
 
         was_set.must_equal true
         (Time.now.to_f - start).must be_lt(0.1)
+
+        t2.join
       end
     end
   end
