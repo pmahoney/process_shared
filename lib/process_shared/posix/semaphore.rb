@@ -26,9 +26,9 @@ module ProcessShared
 
         attach_function :sem_getvalue, [:sem_p, :pointer], :int
         attach_function :sem_post, [:sem_p], :int
-        attach_function :sem_wait, [:sem_p], :int
-        attach_function :sem_trywait, [:sem_p], :int
-        attach_function :sem_timedwait, [:sem_p, TimeSpec], :int
+        attach_function :sem_wait, [:sem_p], :int, :blocking => true
+        attach_function :sem_trywait, [:sem_p], :int, :blocking => true
+        attach_function :sem_timedwait, [:sem_p, TimeSpec], :int, :blocking => true
 
         error_check(:sem_close, :sem_unlink, :sem_init, :sem_destroy,
                     :sem_getvalue, :sem_post, :sem_wait, :sem_trywait,
