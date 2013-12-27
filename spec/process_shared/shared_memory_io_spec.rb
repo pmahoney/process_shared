@@ -1,3 +1,7 @@
+# encoding: UTF-8
+# ^^^
+# NOTE: This magic comment is necessary for the UTF-8 string literal below
+#       on Ruby 1.9.x
 require 'spec_helper'
 require 'process_shared'
 
