@@ -63,5 +63,19 @@ module ProcessShared
         (Time.now.to_f - start).must be_gte(0.1)
       }
     end
+
+    it 'correctly handles #signal when no waiters' do
+      mutex = Mutex.new
+      cond = ConditionVariable.new
+
+      # fix for bug: #wait not waiting after unmatched call to #signal
+      cond.signal
+
+      mutex.synchronize {
+        start = Time.now.to_f
+        cond.wait(mutex, 0.1)
+        (Time.now.to_f - start).must be_gte(0.1)
+      }
+    end
   end
 end
