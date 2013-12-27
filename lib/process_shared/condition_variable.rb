@@ -16,7 +16,9 @@ module ProcessShared
     end
 
     def signal
-      @sem.post
+      @internal.synchronize do
+        @sem.post unless @waiting.read_int.zero?
+      end
     end
 
     def wait(mutex, timeout = nil)
