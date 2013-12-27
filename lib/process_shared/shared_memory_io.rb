@@ -198,6 +198,7 @@ module ProcessShared
     def read(length = nil, buffer = nil)
       length ||= (mem.size - pos)
       buffer ||= ''
+      buffer.force_encoding('ASCII-8BIT') unless RUBY_VERSION.start_with?('1.8')
       
       actual_length = [(mem.size - pos), length].min
       actual_length.times do
