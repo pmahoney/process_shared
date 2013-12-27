@@ -9,7 +9,7 @@ module ProcessShared
     end
 
     def lock
-      if locked_by == ::Process.pid
+      if locked_by == current_process_and_thread
         @lock_count += 1
       else
         super
@@ -17,7 +17,7 @@ module ProcessShared
     end
 
     def unlock
-      if locked_by == ::Process.pid
+      if locked_by == current_process_and_thread
         if @lock_count > 0
           @lock_count -= 1
         else
