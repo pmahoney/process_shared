@@ -55,6 +55,5 @@ module ProcessShared
       mem.get_char(0).must_equal(0)
     end
 
-
   end
 end

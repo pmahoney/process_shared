@@ -26,9 +26,12 @@ module ProcessShared
 
         attach_function :sem_getvalue, [:sem_p, :pointer], :int
         attach_function :sem_post, [:sem_p], :int
-        attach_function :sem_wait, [:sem_p], :int
-        attach_function :sem_trywait, [:sem_p], :int
-        attach_function :sem_timedwait, [:sem_p, TimeSpec], :int
+        attach_function :sem_wait, [:sem_p], :int, :blocking => true
+        attach_function :sem_trywait, [:sem_p], :int, :blocking => true
+
+        # Workaround bug which only appears to affect Ruby 1.8.7 and REE
+        BLOCKING_SEM_TIMEDWAIT = (RUBY_VERSION != '1.8.7')
+        attach_function :sem_timedwait, [:sem_p, TimeSpec], :int, :blocking => BLOCKING_SEM_TIMEDWAIT
 
         error_check(:sem_close, :sem_unlink, :sem_init, :sem_destroy,
                     :sem_getvalue, :sem_post, :sem_wait, :sem_trywait,

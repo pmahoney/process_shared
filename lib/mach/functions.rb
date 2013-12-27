@@ -72,8 +72,8 @@ module Mach
 
     # Attach a function as with +attach_function+, but check the
     # return value and raise an exception on errors.
-    def self.attach_mach_function(sym, argtypes, rettype)
-      attach_function(sym, argtypes, rettype)
+    def self.attach_mach_function(sym, argtypes, rettype, options = nil)
+      attach_function(sym, argtypes, rettype, options)
       error_check(sym)
     end
 
@@ -208,10 +208,12 @@ module Mach
                          :kern_return_t)
     attach_mach_function(:semaphore_wait,
                          [:semaphore_t],
-                         :kern_return_t)
+                         :kern_return_t,
+                         :blocking => true)
     attach_mach_function(:semaphore_timedwait,
                          [:semaphore_t, TimeSpec.val],
-                         :kern_return_t)
+                         :kern_return_t,
+                         :blocking => true)
 
   end
 end
