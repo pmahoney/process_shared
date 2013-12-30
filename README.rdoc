@@ -1,3 +1,8 @@
+{<img src="https://badge.fury.io/rb/process_shared.png"                alt="Gem Version"       />}[http://badge.fury.io/rb/process_shared]
+{<img src="https://travis-ci.org/pmahoney/process_shared.png"          alt="Build Status"      />}[https://travis-ci.org/pmahoney/process_shared.png]
+{<img src="https://gemnasium.com/pmahoney/process_shared.png"          alt="Dependency Status" />}[https://gemnasium.com/pmahoney/process_shared.png]
+{<img src="https://codeclimate.com/github/pmahoney/process_shared.png" alt="Code Cliate"       />}[https://codeclimate.com/github/pmahoney/process_shared.png]
+
 == Description
 
 Concurrency primitives that may be used in a cross-process way to
