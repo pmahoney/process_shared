@@ -45,11 +45,9 @@ module ProcessShared
 
       # @return [Boolean]  +true+ if currently locked
       def locked?
-        @sem.try_wait
-        @sem.post
-        false
-      rescue Errno::EAGAIN
-        true
+        acquired = try_lock
+        unlock if acquired
+        !acquired
       end
 
       # Releases the lock and sleeps timeout seconds if it is given and
