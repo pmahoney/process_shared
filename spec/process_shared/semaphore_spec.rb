@@ -11,11 +11,7 @@ module ProcessShared
       include LockBehavior
 
       before :each do
-        @lock = Semaphore.new
-        class << @lock
-          alias_method :lock, :wait
-          alias_method :unlock, :post
-        end
+        @lock = Semaphore.new.to_mtx
       end
 
       after :each do
@@ -190,6 +186,48 @@ module ProcessShared
           t2.join
         end
       end
+    end
+
+    describe '#to_mtx' do
+      before :each do
+        @mtx = Semaphore.new.to_mtx
+      end
+
+      # NOTE:
+      #   - #lock / #unlock covered by LockingBehavior above
+      #   - #synchronize covered elsewhere as well?
+
+      describe '#locked?' do
+        it 'returns true when locked' do
+          @mtx.synchronize { @mtx.locked?.must_equal true }
+        end
+
+        it 'returns false when not locked' do
+          @mtx.locked?.must_equal false
+        end
+
+        it 'does not itself acquire lock' do
+          @mtx.locked?.must_equal false
+          @mtx.locked?.must_equal false # check again to make sure lock not acquired
+        end
+      end
+
+      describe '#sleep' do
+        # TODO: add tests for #sleep
+      end
+
+      describe '#try_lock' do
+        it 'returns true and acquires lock when unlocked' do
+          @mtx.try_lock.must_equal true
+          @mtx.locked?.must_equal true
+          @mtx.unlock
+        end
+
+        it 'returns false when already locked' do
+          @mtx.synchronize { @mtx.try_lock.must_equal false }
+        end
+      end
+
     end
   end
 end
