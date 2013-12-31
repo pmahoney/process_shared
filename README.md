@@ -1,3 +1,17 @@
+[![Gem Version][gemv-img]][gemv]
+[![Build Status][travis-img]][travis]
+[![Dependency Status][gemnasium-img]][gemnasium]
+[![Code Climate][codeclimate-img]][codeclimate]
+
+[gemv]: https://rubygems.org/gems/process_shared
+[gemv-img]: https://badge.fury.io/rb/process_shared.png
+[travis]: https://travis-ci.org/pmahoney/process_shared
+[travis-img]: https://travis-ci.org/pmahoney/process_shared.png
+[gemnasium]: https://gemnasium.com/pmahoney/process_shared
+[gemnasium-img]: https://gemnasium.com/pmahoney/process_shared.png
+[codeclimate]: https://codeclimate.com/github/pmahoney/process_shared
+[codeclimate-img]: https://codeclimate.com/github/pmahoney/process_shared.png
+
 process_shared
 ==============
 
