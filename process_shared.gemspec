@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version = File.read(File.expand_path('../VERSION', __FILE__))
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README.rdoc", "ChangeLog", "COPYING"]
+  s.extra_rdoc_files = ["README.md", "ChangeLog", "COPYING"]
   s.summary = 'process-shared synchronization primitives'
   s.description = 'FFI wrapper around portable semaphore library with mutex and condition vars built on top.'
   s.author = 'Patrick Mahoney'
@@ -20,5 +20,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('minitest-matchers')
   s.add_development_dependency('rake')
   s.add_development_dependency('rake-compiler')
+  s.add_development_dependency('redcarpet') # for yardoc
   s.add_development_dependency('version')
 end
