@@ -1,8 +1,10 @@
-language: ruby
-rvm:
-  - 2.1.0
-  - 2.0.0
-  - 1.9.3
-  - 1.9.2
+language: objective-c
+branches:
+  only:
+    - travis-osx
+install:
+  - gem install bundler
+  - bundle install
+script: bundle exec rake
 notifications:
   email: false
