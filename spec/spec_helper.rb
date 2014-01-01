@@ -1,7 +1,5 @@
-require 'rubygems' if RUBY_VERSION =~ /^1.8/
-gem 'minitest'
-require 'minitest/spec'
 require 'minitest/autorun'
+require 'minitest/spec'
 require 'minitest/matchers'
 
 require 'process_shared'
