@@ -15,7 +15,7 @@ module Mach
     # Replace methods in +syms+ with error checking wrappers that
     # invoke the original method and raise a {SystemCallError}.
     #
-    # The original method is invoked, and it's return value is passed
+    # The original method is invoked, and its return value is passed
     # to the block (or a default check).  The block should return true
     # if the return value indicates an error state.
     def self.error_check(*syms, &is_err)
