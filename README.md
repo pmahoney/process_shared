@@ -14,26 +14,57 @@
 process_shared
 ==============
 
-Concurrency primitives that may be used in a cross-process way to
-coordinate share memory between processes.
+Cross-process concurrency primitives that may be used to coordinate
+shared memory between processes.
+
+```ruby
+require 'process_shared'
+
+mutex = ProcessShared::Mutex.new
+cond = ProcessShared::ConditionVariable.new
+
+mem = ProcessShared::SharedMemory.new(:int32, 2)  # extends FFI::Pointer
+
+pid1 = fork do
+  nums = mutex.synchronize do
+    cond.wait(mutex)
+    mem.get_array_of_int(0, 2)
+  end
+  puts "process #{Process.pid} received #{nums}"
+end
+
+pid2 = fork do
+  nums = [12345, 67890]
+  mutex.synchronize do
+    puts "process #{Process.pid} sending #{nums}"
+    mem.put_array_of_int(0, nums)
+    cond.signal
+  end
+end
+
+Process.waitall
+```
+
+[API Documentation](http://www.rubydoc.info/github/pmahoney/process_shared/master)
 
 FFI is used to access POSIX semaphore on Linux or Mach semaphores on
-Mac.  Atop these semaphores are implemented ProcessShared::Semaphore,
-ProcessShared::Mutex.  POSIX shared memory is used to implement
-ProcessShared::SharedMemory.
+Mac. Atop these semaphores are implemented `ProcessShared::Semaphore`,
+`ProcessShared::Mutex`. POSIX shared memory is used to implement
+`ProcessShared::SharedMemory`.
 
 On Linux, POSIX semaphores support `sem_timedwait()` which can wait on
 a semaphore but stop waiting after a timeout.
 
 Mac OS X's implementation of POSIX semaphores does not support
-timeouts.  But, the Mach layer in Mac OS X has its own semaphores that
-do support timeouts.  Thus, process_shared implements a moderate
-subset of the Mach API, which is quite a bit different from POSIX.
-Namely, semaphores created in one process are not available in child
-processes created via `fork()`.  Mach does provide the means to copy
-capabilities between tasks (Mach equivalent to processes).
-process_shared overrides Ruby's `fork` methods so that semaphores are
-copied from parent to child to emulate the POSIX behavior.
+timeouts. But, the Mach layer in Mac OS X has its own semaphores that
+do support timeouts. Thus, process_shared implements a moderate subset
+of the Mach API, which is quite a bit different from POSIX. Namely,
+semaphores created in one process are not available in child processes
+created via `fork()`. Mach does provide the means to copy capabilities
+between tasks (Mach equivalent to processes). In a giant hack, **on OS
+X, `process_shared` overrides Ruby's `fork`** methods so that
+semaphores are copied from parent to child to emulate the POSIX
+behavior.
 
 This is an incomplete work in progress.
 
