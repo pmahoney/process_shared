@@ -16,8 +16,22 @@ module ProcessShared
                    FFI::Platform::LIBSUFFIX
                  end
 
-        ffi_lib File.join(File.expand_path(File.dirname(__FILE__)),
-                          'helper.' + suffix)
+        # Ruby 2.1 (also 2.0?) puts extensions into, e.g.
+        # $GEM_HOME/extensions/x86_64-linux/2.1.0/static/$gemname-$gemversion,
+        # so they aren't in the same dir as this file. Normally that's
+        # fine since you're just 'require'ing them, but 'helper.so'
+        # isn't a real Ruby extension; it's just a shared lib to
+        # export some constants that are only available as macros in
+        # libc.
+        #
+        # Fallback to attempting to load from same directory as this file.
+        helper = 'process_shared/posix/helper.' + suffix
+        fallback_path = File.expand_path(File.dirname(__FILE__))
+        path = $LOAD_PATH.find(fallback_path) do |path|
+          File.exists?(File.join(path, helper))
+        end
+
+        ffi_lib File.join(path, helper)
         
         [:o_rdwr,
          :o_creat,
